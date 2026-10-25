@@ -1,0 +1,117 @@
+/*
+       --------------- DIGIT DP ---------------
+
+
+-> give range from [left -> right]
+-> digit dp contains high constraints -> l <= r<= 10^9 / 10^18 
+
+// sample problem
+1 -> count the numberr of digit which is equal to 3 form range left to right
+
+
+let l = 12462
+let r = 46257
+
+index  = 0 1 2 3 4 
+
+we can put at 0 index -> 0 1 2 3 4 5 6 7 8 9
+we can put at 1 index -> 0 1 2 3 4 5 6 7 8 9
+we can put at 2 index -> 0 1 2 3 4 5 6 7 8 9
+we can put at 3 index -> 0 1 2 3 4 5 6 7 8 9
+we can put at 4 index -> 0 1 2 3 4 5 6 7 8 9
+
+
+let range  0 -> r(46257)
+
+if i > r[i] than not include at index 0 ,
+
+if i <= r[i] than make two groups
+                                     first group contains -> 0 1 2 3 
+                                     second group contains -> 4 
+continue;
+
+define boolean veriable tight/flag or etc - >if tight is true means restriction
+                                             
+ if tight is false means non-restriction -> if false than in future false will not change in true
+
+dp[index][tight][count]
+
+
+         --------------- Template Code ---------------
+
+        public class Main{
+ 
+        static int dp[][][];
+        
+
+         static int solve(String s , int index , int tight , int count){
+          if(index >= s.length()){
+            return count;
+          }
+
+          if(dp[index][tight][count] != -1){
+            return dp[index][tight][count];
+          }
+
+          // if in restricted mode (tight == true/1) than limit should be s.charAt(i)
+          // else in non restricted mode (tight == false/0) than limit equal to 9
+          int limit = tight == 1 ? s.charAt(index)-'0 : 9;
+
+
+          // define answers variable
+          int ans = 0;
+
+          for(int i = 0 ; i <= limit ; i++){
+          // if i is equal to 3 than add 1 in count
+            int updateCount = count + (i == 3) ? 1 : 0; 
+
+            boolean restrictionFlag = (i == s.charAt(i)-'0); // 
+
+            // add all count in ans by using call recursion
+            ans += solve(s , index+1 , (tight & restrictionFlag) , updateCount);
+          }
+            return dp[index][tight][count] = ans;
+         }
+        
+         public static void main(String[]args){
+           Scanner sc = new Scanner(System.in);
+
+           System.out.println("Enter starting point :");
+           String l  = sc.nextLine();
+           System.out.println("Enter ending point :");
+           String r = sc.nextLine();
+
+           // initialize dp arrays
+           dp = new int[20][2][20];
+
+           for(int i = 0 ; i < n ; i++){
+             for(int j = 0 ; j <2 ; j++){
+               Arrays.fill(dp[i][j] , -1);
+             }
+           }
+
+           int rightAns = solve(r , 0 , 1 , 0); // string , index , tight , count
+
+
+           // reinitialize dp
+           for(int i = 0 ; i < n ; i++){
+             for(int j = 0 ; j <2 ; j++){
+               Arrays.fill(dp[i][j] , -1);
+             }
+           }
+
+           int leftAns = solve(l , 0, 1 , 0) // string , index , tight , count
+
+           System.out.println(rightAns - leftAns);
+
+
+
+         }
+        }
+
+        
+
+
+
+
+*/

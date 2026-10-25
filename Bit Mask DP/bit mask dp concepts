@@ -1,0 +1,228 @@
+
+
+-> What is a 'bitmask' in cp terms?
+-------------------------------------------------------------------------------------------
+
+  A bitmask is just an integer where each bit(0/1) represents some yes/no information.
+
+  Example for n = 5
+    
+    we have elements 0 1 2 3 4 5
+
+    A mask like = (10110)base2 means :->
+       bit 0 = 0 -> element 0 not present
+       bit 1 = 1 -> element 1 present
+       bit 2 = 1 -> element 2 present
+       bit 3 = 0 -> element 3 not present
+       bit 4 = 1 -> element 4 present
+
+-------------------------------------------------------------------------------------------
+# Basic bit operations for int : ->
+-------------------------------------------------------------------------------------------
+
+    -> check if i-th bit is set   =   mask & (i << i) != 0
+
+    -> set i-th bit  =  mask |= (1 << i)
+
+    -> unset i-th bit = mask &= ~(1 << i)
+
+    -> toggle i-th bit = mask ^= (1 << i)
+
+Treat mask as a set of indices or a subset of {0 , , n-1}
+
+-------------------------------------------------------------------------------------------
+# Two Core Patterns of BitMask DP
+        -----------------------------------------------------------------------------------
+      1 -> Dp over subSets :
+        -----------------------------------------------------------------------------------
+           
+            // dp[mask] = best answer for this subset
+        -----------------------------------------------------------------------------------
+        @Exaplaination using Question :->
+        ------------------------------------------------------------------------------------
+
+        you have n people and n jobs.
+        cost[i][j] = cost if person : does job j 
+        Each person must be assigned exactly one job and each job can be used at most once. minimize total cost.
+        
+        constains : n <= 20
+
+        we want to assign jobs to person : 0 --> n-1
+        Total masks = 2^n
+
+        ------------------------------------------------------------------------------------
+        @ step 1 :->
+        ------------------------------------------------------------------------------------
+           ---- Try to think what information do I need to make future decision
+           
+                ---Suppose we go person by person in order :-> 0 1 2 3 _ _ _ _ n-1
+                ---At some point , we are at person i , and some jobs are already taken
+
+          ----- We can  encoded "Which jobs are already taken" using a bitmask
+
+                ---Mask -> if i-th bit is 1 , job i is already assigned  
+                ---Number of assigned job = pop count of mask
+
+          ----- if we assign jobs in order of persons ,than :->
+
+                --- When mask has k bit set , that means we have already assignd jobs to the first k people
+                --- So i = pop count of mask 
+
+          ----- so we can define :->
+
+                --- dp[mask] = minimum total cost to assign jobs to the first pop count of mask people, using exactly the jobs in mask.
+
+
+
+         $Base Case :-> 
+          -------------
+
+              --- dp[0] = 0 (no person assigned , no jobs used , cost = 0)
+
+          $Answer :->
+          
+              --- we want all n people assigned ,so all n jobs used : mask = (1 << n) - 1
+
+              --- answer is dp[(1 << n)-1].
+
+        ------------------------------------------------------------------------------------
+        @ step 2 :->      
+        ------------------------------------------------------------------------------------
+
+          ---- From current mask :
+            
+               Let i = pop count of mask -> next person to assign
+               Try to assign some free jobs j (bit j = 0  in mask)
+
+          -----------------------------------------------------------------------------------
+          ---- Transition :->
+          -----------------------------------------------------------------------------------
+
+               for(int mask = 0 ; mask < (1 << n) ; mask++){
+                 int i == pop count of mask
+
+                 if(i >= n){
+                    continue;
+                 }
+
+                 for(int j = 0 ; j < n ; j++){
+                  if(!mask & (i << j)){
+                    int newMask = mask | (1 << j){
+                      dp[newMask] = Math.min(dp[newMask] , ,dp[mask]+ cost[i][j]);
+                    }
+                  }
+                 }
+               }     
+
+
+
+
+
+
+
+
+#################################### FULL CODE TEMPLATE ####################################
+
+//  import java.util.*;
+
+// public class Main {
+
+//     static int n;
+//     static long dp[][];
+
+//     static long solve(int mask, int state) {
+
+//         // ==========================
+//         // BASE CASE
+//         // CHANGE THIS
+//         // ==========================
+//         if(mask == (1 << n) - 1) {
+//             return 0; // or 1 depending on problem
+//         }
+
+//         // ==========================
+//         // MEMOIZATION
+//         // ==========================
+//         if(dp[mask][state] != -1) {
+//             return dp[mask][state];
+//         }
+
+//         // ==========================
+//         // INITIAL ANSWER
+//         // CHANGE THIS
+//         // ==========================
+//         long ans = 0;
+
+//         // For Min problems:
+//         // long ans = Long.MAX_VALUE;
+
+//         // For Max problems:
+//         // long ans = Long.MIN_VALUE;
+
+//         // ==========================
+//         // TRY ALL ELEMENTS
+//         // ==========================
+//         for(int next = 0; next < n; next++) {
+
+//             // not selected
+//             if((mask & (1 << next)) == 0) {
+
+//                 // ======================
+//                 // VALIDITY CHECK
+//                 // CHANGE THIS
+//                 // ======================
+//                 boolean valid = true;
+
+//                 if(valid) {
+//                     int newMask = mask | (1 << next);
+//                     // ======================
+//                     // TRANSITION
+//                     // CHANGE THIS according to problems
+//                     // ======================
+//                     ans += solve(newMask, next);
+//                     /*
+//                      COUNTING
+//                       ans += solve(newMask,next);
+//                     */
+
+//                     /*
+//                      MINIMIZATION
+//                      ans = Math.min(ans,cost + solve(newMask,next));
+//                     */
+
+//                     /*
+//                      MAXIMIZATION
+//                      ans = Math.max(ans,value + solve(newMask,next));
+//                     */
+//                 }
+//             }
+//         }
+
+//         return dp[mask][state] = ans;
+//     }
+
+//     public static void main(String[] args) {
+
+//         n = 15;
+
+//         dp = new long[1 << n][n + 1];
+
+//         for(long row[] : dp) {
+//             Arrays.fill(row, -1);
+//         }
+
+//         System.out.println(solve(0, n));
+//     }
+// }
+
+
+
+
+$$$$$$$$$ When to Use It (The Key Indicators)
+
+
+Small Constraints: The number of items, nodes, or people (N) is small (e.g., N ≤ 20). 
+Standard arrays or sets cannot store all subsets, but a single integer can.Subset/Combination 
+Tracking: You need to track exactly which items have been "visited," "used," or "assigned" in a specific state.
+Exponential Solution Required: The problem has overlapping 
+subproblems and optimal substructure, but standard DP states don't provide enough history.
